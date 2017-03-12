@@ -1,0 +1,24 @@
+Writes a string to stdout (terminated with CR) when a GPIO-attached button is pushed.
+
+Compile:
+  make
+
+Usage: 
+  ./btn-watch 4 A50 1000000 A00 200000 > /dev/ttyUSB0
+
+Setup Device Tree:
+  vim gpio_pull-overlay.dts # Set the GPIO pin number
+  dtc -@ -I dts -O dtb -o gpio_pull.dtbo gpio_pull-overlay.dts
+  mv gpio_pull.dtbo /boot/overlays/
+  echo 'dtoverlay=gpio_pull' >> /boot/config.txt
+  reboot
+
+Setup GPIO Pin:
+  echo 4 > /sys/class/gpio/export
+  echo both > /sys/class/gpio/gpio4/edge
+
+Setup Serial Port:
+  stty raw -echo < /dev/ttyUSB0
+
+A overlay device tree must be configured to enable the internal pull-down resistor on the GPIO pin.
+The GPIO pin must be exported and setup as an input with "both" edge detection before starting btn-watch.
